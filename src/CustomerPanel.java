@@ -22,7 +22,7 @@ public class CustomerPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
 
         // Form panel
-    JPanel form = new JPanel(new GridLayout(2, 5, 5, 5));
+        JPanel form = new JPanel(new GridLayout(2, 5, 5, 5));
         tfName = new JTextField();
         tfEmail = new JTextField();
         tfPhone = new JTextField();
@@ -30,8 +30,8 @@ public class CustomerPanel extends JPanel {
         btnUpdate = new JButton("Update");
         btnDelete = new JButton("Delete");
         btnClear = new JButton("Clear");
-    cbSeats = new JComboBox<>();
-    cbSeats.setEnabled(true); // Allow selection
+        cbSeats = new JComboBox<>();
+        cbSeats.setEnabled(true); // Allow selection
 
         form.add(new JLabel("Name:"));
         form.add(tfName);
@@ -39,8 +39,8 @@ public class CustomerPanel extends JPanel {
         form.add(tfEmail);
         form.add(new JLabel("Phone:"));
         form.add(tfPhone);
-    form.add(new JLabel("Available Seats:"));
-    form.add(cbSeats);
+        form.add(new JLabel("Available Seats:"));
+        form.add(cbSeats);
         form.add(btnAdd);
         form.add(btnUpdate);
         form.add(btnDelete);
@@ -50,7 +50,7 @@ public class CustomerPanel extends JPanel {
 
         // Load customers
         loadCustomers();
-    loadSeats();
+        loadSeats();
 
         // Table selection
         table.getSelectionModel().addListSelectionListener(e -> {
@@ -68,6 +68,7 @@ public class CustomerPanel extends JPanel {
         btnDelete.addActionListener(e -> deleteCustomer());
         btnClear.addActionListener(e -> clearForm());
     }
+
     private void loadSeats() {
         cbSeats.removeAllItems();
         try (Connection con = DBUtil.getConnection();
