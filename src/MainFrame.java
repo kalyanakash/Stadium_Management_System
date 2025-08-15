@@ -3,12 +3,19 @@ import javax.swing.*;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
+    public void showRegisterPanel() {
+        registerPanel = new RegisterPanel(this);
+        cardPanel.add(registerPanel, "register");
+        cardLayout.show(cardPanel, "register");
+    }
+
+    private RegisterPanel registerPanel;
     private CardLayout cardLayout;
     private JPanel cardPanel;
     private WelcomePanel welcomePanel;
     private LoginPanel loginPanel;
-    private JPanel adminPanel;
-    private JPanel userPanel;
+    private AdminPanel adminPanel;
+    private UserPanel userPanel;
 
     public MainFrame() {
         setTitle("Stadium Management System");
@@ -32,14 +39,12 @@ public class MainFrame extends JFrame {
         cardPanel.add(welcomePanel, "welcome");
 
         // Placeholders for login/admin/user panels
+        registerPanel = null;
         loginPanel = null;
-        adminPanel = new JPanel(new BorderLayout());
-        adminPanel.add(new JLabel("Admin Dashboard (TODO)"), BorderLayout.CENTER);
+        adminPanel = new AdminPanel(this);
         cardPanel.add(adminPanel, "admin");
 
-        userPanel = new JPanel(new BorderLayout());
-        userPanel.add(new JLabel("User Dashboard (TODO)"), BorderLayout.CENTER);
-        cardPanel.add(userPanel, "user");
+        // userPanel will be initialized after login with username
 
         add(cardPanel, BorderLayout.CENTER);
         showWelcomePanel();
@@ -60,6 +65,8 @@ public class MainFrame extends JFrame {
     }
 
     public void showUserPanel(String username) {
+        userPanel = new UserPanel(this, username);
+        cardPanel.add(userPanel, "user");
         cardLayout.show(cardPanel, "user");
     }
 

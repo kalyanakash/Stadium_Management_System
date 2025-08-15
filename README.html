@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Stadium Management System using Java Swing and MySQL</title>
+            <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only],
+.vscode-high-contrast:not(.vscode-high-contrast-light) img[src$=\#gh-light-mode-only],
+.vscode-high-contrast-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+</style>
+            
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item {
+    list-style-type: none;
+}
+
+.task-list-item-checkbox {
+    margin-left: -20px;
+    vertical-align: middle;
+    pointer-events: none;
+}
+</style>
+<style>
+:root {
+  --color-note: #0969da;
+  --color-tip: #1a7f37;
+  --color-warning: #9a6700;
+  --color-severe: #bc4c00;
+  --color-caution: #d1242f;
+  --color-important: #8250df;
+}
+
+</style>
+<style>
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-note: #2f81f7;
+    --color-tip: #3fb950;
+    --color-warning: #d29922;
+    --color-severe: #db6d28;
+    --color-caution: #f85149;
+    --color-important: #a371f7;
+  }
+}
+
+</style>
+<style>
+.markdown-alert {
+  padding: 0.5rem 1rem;
+  margin-bottom: 16px;
+  color: inherit;
+  border-left: .25em solid #888;
+}
+
+.markdown-alert>:first-child {
+  margin-top: 0
+}
+
+.markdown-alert>:last-child {
+  margin-bottom: 0
+}
+
+.markdown-alert .markdown-alert-title {
+  display: flex;
+  font-weight: 500;
+  align-items: center;
+  line-height: 1
+}
+
+.markdown-alert .markdown-alert-title .octicon {
+  margin-right: 0.5rem;
+  display: inline-block;
+  overflow: visible !important;
+  vertical-align: text-bottom;
+  fill: currentColor;
+}
+
+.markdown-alert.markdown-alert-note {
+  border-left-color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-note .markdown-alert-title {
+  color: var(--color-note);
+}
+
+.markdown-alert.markdown-alert-important {
+  border-left-color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-important .markdown-alert-title {
+  color: var(--color-important);
+}
+
+.markdown-alert.markdown-alert-warning {
+  border-left-color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-warning .markdown-alert-title {
+  color: var(--color-warning);
+}
+
+.markdown-alert.markdown-alert-tip {
+  border-left-color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-tip .markdown-alert-title {
+  color: var(--color-tip);
+}
+
+.markdown-alert.markdown-alert-caution {
+  border-left-color: var(--color-caution);
+}
+
+.markdown-alert.markdown-alert-caution .markdown-alert-title {
+  color: var(--color-caution);
+}
+
+</style>
+        
+        </head>
+        <body class="vscode-body vscode-light">
+            <h1 id="stadium-management-system-using-java-swing-and-mysql">Stadium Management System using Java Swing and MySQL</h1>
+<h2 id="project-objective">Project Objective</h2>
+<p>A desktop application to manage stadium events, ticket bookings, seat pricing, and customer information. The system provides user-friendly panels for both administrators and customers, with all data stored securely in a MySQL database.</p>
+<h2 id="features--functionalities">Features &amp; Functionalities</h2>
+<h3 id="1-event-management">1. Event Management</h3>
+<ul>
+<li>Add, edit, delete, and view events (name, date, stadium).</li>
+<li>Event overview tab for users to browse events and seat details.</li>
+</ul>
+<h3 id="2-stadium-management">2. Stadium Management</h3>
+<ul>
+<li>View all stadiums and their locations.</li>
+<li>Stadium tab in user panel: select a stadium to view all seats and prices for that stadium.</li>
+</ul>
+<h3 id="3-seat--price-management">3. Seat &amp; Price Management</h3>
+<ul>
+<li>Unique seat numbers for each stadium (e.g., A1-D10 for Stadium 1, E1-H10 for Stadium 2, etc.).</li>
+<li>Seat prices mapped per stadium and seat type.</li>
+<li>Admin panel displays all seat prices with stadium info.</li>
+<li>Customer panel shows seat, stadium, price, and availability in dropdowns.</li>
+</ul>
+<h3 id="4-customer-management">4. Customer Management</h3>
+<ul>
+<li>Register, update, and delete customers.</li>
+<li>Search customers by name or ID.</li>
+</ul>
+<h3 id="5-ticket-management">5. Ticket Management</h3>
+<ul>
+<li>Book tickets for events and seats.</li>
+<li>Assign seat numbers and calculate ticket prices.</li>
+<li>Cancel tickets.</li>
+<li>Display booked tickets with all details.</li>
+</ul>
+<h3 id="6-reporting--viewing">6. Reporting &amp; Viewing</h3>
+<ul>
+<li>Display available and booked seats for each event and stadium.</li>
+<li>Search and filter events, customers, tickets, and seats.</li>
+</ul>
+<h2 id="technology-stack">Technology Stack</h2>
+<ul>
+<li><strong>Frontend:</strong> Java Swing (GUI)</li>
+<li><strong>Backend:</strong> MySQL</li>
+<li><strong>Database Connectivity:</strong> JDBC</li>
+<li><strong>IDE:</strong> NetBeans, Eclipse, or VS Code</li>
+</ul>
+<h2 id="database-design">Database Design</h2>
+<h3 id="tables">Tables</h3>
+<h4 id="stadium-table">Stadium Table</h4>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>stadium_id</td>
+<td>INT PK</td>
+<td>Unique Stadium ID</td>
+</tr>
+<tr>
+<td>stadium_name</td>
+<td>VARCHAR</td>
+<td>Stadium Name</td>
+</tr>
+<tr>
+<td>location</td>
+<td>VARCHAR</td>
+<td>Stadium Location</td>
+</tr>
+</tbody>
+</table>
+<h4 id="event-table">Event Table</h4>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>event_id</td>
+<td>INT PK</td>
+<td>Unique ID</td>
+</tr>
+<tr>
+<td>event_name</td>
+<td>VARCHAR</td>
+<td>Name of event</td>
+</tr>
+<tr>
+<td>date</td>
+<td>DATE</td>
+<td>Date of event</td>
+</tr>
+<tr>
+<td>stadium</td>
+<td>VARCHAR</td>
+<td>Stadium name</td>
+</tr>
+</tbody>
+</table>
+<h4 id="customer-table">Customer Table</h4>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>customer_id</td>
+<td>INT PK</td>
+<td>Unique ID</td>
+</tr>
+<tr>
+<td>name</td>
+<td>VARCHAR</td>
+<td>Customer Name</td>
+</tr>
+<tr>
+<td>email</td>
+<td>VARCHAR</td>
+<td>Email Address</td>
+</tr>
+<tr>
+<td>phone</td>
+<td>VARCHAR</td>
+<td>Phone Number</td>
+</tr>
+</tbody>
+</table>
+<h4 id="ticket-table">Ticket Table</h4>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ticket_id</td>
+<td>INT PK</td>
+<td>Unique ID</td>
+</tr>
+<tr>
+<td>event_id</td>
+<td>INT FK</td>
+<td>Linked Event</td>
+</tr>
+<tr>
+<td>customer_id</td>
+<td>INT FK</td>
+<td>Linked Customer</td>
+</tr>
+<tr>
+<td>seat_no</td>
+<td>VARCHAR</td>
+<td>Seat Number</td>
+</tr>
+<tr>
+<td>price</td>
+<td>DECIMAL</td>
+<td>Ticket Price</td>
+</tr>
+</tbody>
+</table>
+<h4 id="seats-table">Seats Table</h4>
+<table>
+<thead>
+<tr>
+<th>Column</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>seat_no</td>
+<td>VARCHAR</td>
+<td>Seat Number</td>
+</tr>
+<tr>
+<td>stadium_id</td>
+<td>INT FK</td>
+<td>Linked Stadium</td>
+</tr>
+<tr>
+<td>price</td>
+<td>DECIMAL</td>
+<td>Seat Price</td>
+</tr>
+</tbody>
+</table>
+<h2 id="implementation-steps">Implementation Steps</h2>
+<ol>
+<li>
+<p><strong>Setup MySQL Database</strong></p>
+<ul>
+<li>Create <code>stadium_db</code> database.</li>
+<li>Run provided SQL scripts in <code>resources/</code> to create tables and insert default data.</li>
+</ul>
+</li>
+<li>
+<p><strong>Java Project Setup</strong></p>
+<ul>
+<li>Place all <code>.java</code> files in <code>src/</code>.</li>
+<li>Add MySQL JDBC connector (<code>lib/mysql-connector-j-9.4.0.jar</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>GUI Design</strong></p>
+<ul>
+<li>Use Swing components (<code>JFrame</code>, <code>JPanel</code>, <code>JTable</code>, etc.).</li>
+<li>Admin panel: manage events, tickets, customers, seat prices.</li>
+<li>User panel: view events, stadiums, seats, book tickets.</li>
+</ul>
+</li>
+<li>
+<p><strong>CRUD Operations</strong></p>
+<ul>
+<li>Implement add, update, delete, and search for all entities.</li>
+<li>Connect GUI actions to MySQL using JDBC.</li>
+</ul>
+</li>
+<li>
+<p><strong>Testing &amp; Validation</strong></p>
+<ul>
+<li>Test all forms and database connections.</li>
+<li>Validate user inputs and error handling.</li>
+</ul>
+</li>
+</ol>
+<h2 id="how-to-run">How to Run</h2>
+<ol>
+<li>Ensure MySQL is running and <code>stadium_db</code> is set up.</li>
+<li>Compile all Java files:<pre><code>javac -cp &quot;src;lib/mysql-connector-j-9.4.0.jar&quot; src/*.java
+</code></pre>
+</li>
+<li>Run the application:<pre><code>java -cp &quot;src;lib/mysql-connector-j-9.4.0.jar&quot; MainFrame
+</code></pre>
+</li>
+</ol>
+<h2 id="expected-outcome">Expected Outcome</h2>
+<ul>
+<li>A fully functional desktop application for stadium management.</li>
+<li>Clear stadium-wise seat and price display for both admin and users.</li>
+<li>Secure, reliable data storage and retrieval.</li>
+</ul>
+
+            
+            
+        </body>
+        </html>

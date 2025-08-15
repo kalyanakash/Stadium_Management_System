@@ -35,7 +35,8 @@ public class LoginPanel extends JPanel {
             String username = tfUsername.getText();
             String password = new String(tfPassword.getPassword());
             try (Connection con = DBUtil.getConnection();
-                 PreparedStatement ps = con.prepareStatement("SELECT * FROM users WHERE username=? AND password=? AND role=?")) {
+                    PreparedStatement ps = con
+                            .prepareStatement("SELECT * FROM users WHERE username=? AND password=? AND role=?")) {
                 ps.setString(1, username);
                 ps.setString(2, password);
                 ps.setString(3, role);
@@ -53,5 +54,14 @@ public class LoginPanel extends JPanel {
                 JOptionPane.showMessageDialog(this, "Login error: " + ex.getMessage());
             }
         });
+
+        gbc.gridy++;
+        gbc.gridwidth = 2;
+        JButton btnBack = new JButton("Back");
+        btnBack.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        btnBack.setBackground(new Color(52, 152, 219));
+        btnBack.setForeground(Color.WHITE);
+        btnBack.addActionListener(e -> mainFrame.showWelcomePanel());
+        add(btnBack, gbc);
     }
 }

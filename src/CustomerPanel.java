@@ -73,9 +73,32 @@ public class CustomerPanel extends JPanel {
         cbSeats.removeAllItems();
         try (Connection con = DBUtil.getConnection();
                 Statement st = con.createStatement();
-                ResultSet rs = st.executeQuery("SELECT seat_no FROM ticket")) {
-            while (rs.next()) {
-                cbSeats.addItem(rs.getString("seat_no"));
+                ResultSet rsAll = st.executeQuery(
+                        "SELECT s.stadium_name, seat_no, price FROM seats LEFT JOIN stadium s ON seats.stadium_id = s.stadium_id")) {
+            // Collect all seats with stadium and price
+            java.util.List<String[]> allSeats = new java.util.ArrayList<>();
+            while (rsAll.next()) {
+                String stadium = rsAll.getString("stadium_name");
+                String seatNo = rsAll.getString("seat_no");
+                String price = rsAll.getString("price");
+                allSeats.add(new String[] { seatNo, stadium, price });
+            }
+            // Find booked seats
+            ResultSet rsBooked = st.executeQuery("SELECT seat_no FROM ticket");
+            java.util.Set<String> bookedSeats = new java.util.HashSet<>();
+            while (rsBooked.next()) {
+                bookedSeats.add(rsBooked.getString("seat_no"));
+            }
+            // Display seats with status, stadium, and price
+            for (String[] seatArr : allSeats) {
+                String seat = seatArr[0];
+                String stadium = seatArr[1];
+                String price = seatArr[2];
+                if (bookedSeats.contains(seat)) {
+                    cbSeats.addItem(seat + " (" + stadium + ") - Rs. " + price + " (Booked)");
+                } else {
+                    cbSeats.addItem(seat + " (" + stadium + ") - Rs. " + price + " (Available)");
+                }
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error loading seats: " + ex.getMessage());
@@ -87,9 +110,15 @@ public class CustomerPanel extends JPanel {
         try (Connection con = DBUtil.getConnection();
                 Statement st = con.createStatement();
                 ResultSet rs = st.executeQuery("SELECT * FROM customer")) {
+            java.util.Set<String> uniqueCustomers = new java.util.HashSet<>();
             while (rs.next()) {
-                tableModel.addRow(new Object[] { rs.getInt("customer_id"), rs.getString("name"), rs.getString("email"),
-                        rs.getString("phone") });
+                String email = rs.getString("email");
+                String phone = rs.getString("phone");
+                String uniqueKey = email + "|" + phone;
+                if (!uniqueCustomers.contains(uniqueKey)) {
+                    tableModel.addRow(new Object[] { rs.getInt("customer_id"), rs.getString("name"), email, phone });
+                    uniqueCustomers.add(uniqueKey);
+                }
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error loading customers: " + ex.getMessage());

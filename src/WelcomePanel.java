@@ -12,11 +12,14 @@ public class WelcomePanel extends JPanel {
         JPanel btnPanel = new JPanel(new FlowLayout());
         JButton btnAdmin = new JButton("Admin Login");
         JButton btnUser = new JButton("User Login");
+        JButton btnRegister = new JButton("Register");
         btnPanel.add(btnAdmin);
         btnPanel.add(btnUser);
+        btnPanel.add(btnRegister);
         add(btnPanel, BorderLayout.CENTER);
 
         btnAdmin.addActionListener(e -> mainFrame.showLoginPanel("admin"));
         btnUser.addActionListener(e -> mainFrame.showLoginPanel("user"));
+        btnRegister.addActionListener(e -> mainFrame.showRegisterPanel());
     }
 }

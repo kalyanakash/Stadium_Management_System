@@ -1,4 +1,3 @@
-
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -7,7 +6,7 @@ import java.sql.*;
 public class TicketPanel extends JPanel {
     private DefaultTableModel tableModel;
     private JTable table;
-    private JComboBox<String> cbEvent, cbCustomer;
+    private JComboBox<String> cbEvent, cbCustomer, cbAvailableSeats;
     private JTextField tfSeat, tfPrice;
     private JButton btnBook, btnCancel, btnClear;
     private int selectedId = -1;
@@ -16,15 +15,17 @@ public class TicketPanel extends JPanel {
         setLayout(new BorderLayout());
 
         // Table setup
-        tableModel = new DefaultTableModel(new String[] { "ID", "Event", "Customer", "Seat", "Price" }, 0);
+        tableModel = new DefaultTableModel(
+                new String[] { "ID", "Event", "Customer", "Email", "Phone", "Seat", "Price" }, 0);
         table = new JTable(tableModel);
         JScrollPane scrollPane = new JScrollPane(table);
         add(scrollPane, BorderLayout.CENTER);
 
         // Form panel
-        JPanel form = new JPanel(new GridLayout(2, 5, 5, 5));
+        JPanel form = new JPanel(new GridLayout(3, 4, 5, 5));
         cbEvent = new JComboBox<>();
         cbCustomer = new JComboBox<>();
+        cbAvailableSeats = new JComboBox<>();
         tfSeat = new JTextField();
         tfPrice = new JTextField();
         btnBook = new JButton("Book");
@@ -36,6 +37,8 @@ public class TicketPanel extends JPanel {
         form.add(cbEvent);
         form.add(new JLabel("Customer:"));
         form.add(cbCustomer);
+        form.add(new JLabel("Available Seats:"));
+        form.add(cbAvailableSeats);
         form.add(new JLabel("Seat No:"));
         form.add(tfSeat);
         form.add(new JLabel("Price:"));
@@ -52,25 +55,7 @@ public class TicketPanel extends JPanel {
         loadCustomers();
         loadTickets();
 
-        // Table selection
-        table.getSelectionModel().addListSelectionListener(e -> {
-            int row = table.getSelectedRow();
-            if (row >= 0) {
-                selectedId = Integer.parseInt(tableModel.getValueAt(row, 0).toString());
-                cbEvent.setSelectedItem(tableModel.getValueAt(row, 1).toString());
-                cbCustomer.setSelectedItem(tableModel.getValueAt(row, 2).toString());
-                tfSeat.setText(tableModel.getValueAt(row, 3).toString());
-                tfPrice.setText(tableModel.getValueAt(row, 4).toString());
-            }
-        });
-
-        btnBook.addActionListener(e -> bookTicket());
-        btnCancel.addActionListener(e -> cancelTicket());
-        btnClear.addActionListener(e -> clearForm());
-        btnRefresh.addActionListener(e -> {
-            loadEvents();
-            loadCustomers();
-        });
+        cbEvent.addActionListener(e -> loadAvailableSeatsForEvent());
     }
 
     private void loadEvents() {
@@ -101,13 +86,20 @@ public class TicketPanel extends JPanel {
 
     private void loadTickets() {
         tableModel.setRowCount(0);
-        String sql = "SELECT t.ticket_id, e.event_name, c.name, t.seat_no, t.price FROM ticket t JOIN event e ON t.event_id=e.event_id JOIN customer c ON t.customer_id=c.customer_id";
+        String sql = "SELECT t.ticket_id, e.event_name, c.name, c.email, c.phone, t.seat_no, t.price FROM ticket t JOIN event e ON t.event_id=e.event_id JOIN customer c ON t.customer_id=c.customer_id";
         try (Connection con = DBUtil.getConnection();
                 Statement st = con.createStatement();
                 ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
-                tableModel.addRow(new Object[] { rs.getInt(1), rs.getString(2), rs.getString(3), rs.getString(4),
-                        rs.getDouble(5) });
+                tableModel.addRow(new Object[] {
+                        rs.getInt(1), // ticket_id
+                        rs.getString(2), // event_name
+                        rs.getString(3), // customer name
+                        rs.getString(4), // email
+                        rs.getString(5), // phone
+                        rs.getString(6), // seat_no
+                        rs.getDouble(7) // price
+                });
             }
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "Error loading tickets: " + ex.getMessage());
@@ -186,5 +178,35 @@ public class TicketPanel extends JPanel {
         tfPrice.setText("");
         selectedId = -1;
         table.clearSelection();
+    }
+
+    private void loadAvailableSeatsForEvent() {
+        cbAvailableSeats.removeAllItems();
+        int eventId = getSelectedEventId();
+        if (eventId == -1)
+            return;
+        try (Connection con = DBUtil.getConnection();
+                Statement st = con.createStatement()) {
+            // Get all seats
+            ResultSet rsAll = st.executeQuery("SELECT seat_no FROM seats");
+            java.util.List<String> allSeats = new java.util.ArrayList<>();
+            while (rsAll.next()) {
+                allSeats.add(rsAll.getString("seat_no"));
+            }
+            // Get booked seats for this event
+            ResultSet rsBooked = st.executeQuery("SELECT seat_no FROM ticket WHERE event_id=" + eventId);
+            java.util.Set<String> bookedSeats = new java.util.HashSet<>();
+            while (rsBooked.next()) {
+                bookedSeats.add(rsBooked.getString("seat_no"));
+            }
+            // Add only available seats
+            for (String seat : allSeats) {
+                if (!bookedSeats.contains(seat)) {
+                    cbAvailableSeats.addItem(seat);
+                }
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error loading available seats: " + ex.getMessage());
+        }
     }
 }
