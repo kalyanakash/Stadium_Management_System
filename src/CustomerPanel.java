@@ -9,6 +9,7 @@ public class CustomerPanel extends JPanel {
     private JTable table;
     private JTextField tfName, tfEmail, tfPhone;
     private JButton btnAdd, btnUpdate, btnDelete, btnClear;
+    private JComboBox<String> cbSeats;
     private int selectedId = -1;
 
     public CustomerPanel() {
@@ -21,7 +22,7 @@ public class CustomerPanel extends JPanel {
         add(scrollPane, BorderLayout.CENTER);
 
         // Form panel
-        JPanel form = new JPanel(new GridLayout(2, 4, 5, 5));
+    JPanel form = new JPanel(new GridLayout(2, 5, 5, 5));
         tfName = new JTextField();
         tfEmail = new JTextField();
         tfPhone = new JTextField();
@@ -29,6 +30,8 @@ public class CustomerPanel extends JPanel {
         btnUpdate = new JButton("Update");
         btnDelete = new JButton("Delete");
         btnClear = new JButton("Clear");
+    cbSeats = new JComboBox<>();
+    cbSeats.setEnabled(true); // Allow selection
 
         form.add(new JLabel("Name:"));
         form.add(tfName);
@@ -36,6 +39,8 @@ public class CustomerPanel extends JPanel {
         form.add(tfEmail);
         form.add(new JLabel("Phone:"));
         form.add(tfPhone);
+    form.add(new JLabel("Available Seats:"));
+    form.add(cbSeats);
         form.add(btnAdd);
         form.add(btnUpdate);
         form.add(btnDelete);
@@ -45,6 +50,7 @@ public class CustomerPanel extends JPanel {
 
         // Load customers
         loadCustomers();
+    loadSeats();
 
         // Table selection
         table.getSelectionModel().addListSelectionListener(e -> {
@@ -61,6 +67,18 @@ public class CustomerPanel extends JPanel {
         btnUpdate.addActionListener(e -> updateCustomer());
         btnDelete.addActionListener(e -> deleteCustomer());
         btnClear.addActionListener(e -> clearForm());
+    }
+    private void loadSeats() {
+        cbSeats.removeAllItems();
+        try (Connection con = DBUtil.getConnection();
+                Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery("SELECT seat_no FROM ticket")) {
+            while (rs.next()) {
+                cbSeats.addItem(rs.getString("seat_no"));
+            }
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(this, "Error loading seats: " + ex.getMessage());
+        }
     }
 
     private void loadCustomers() {
@@ -81,8 +99,9 @@ public class CustomerPanel extends JPanel {
         String name = tfName.getText();
         String email = tfEmail.getText();
         String phone = tfPhone.getText();
-        if (name.isEmpty() || email.isEmpty() || phone.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "All fields required.");
+        String seat = (String) cbSeats.getSelectedItem();
+        if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || seat == null || seat.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "All fields including seat are required.");
             return;
         }
         try (Connection con = DBUtil.getConnection();
@@ -91,6 +110,7 @@ public class CustomerPanel extends JPanel {
             ps.setString(1, name);
             ps.setString(2, email);
             ps.setString(3, phone);
+            // Optionally, you can store seat info in customer table if schema allows
             ps.executeUpdate();
             loadCustomers();
             clearForm();
@@ -107,6 +127,11 @@ public class CustomerPanel extends JPanel {
         String name = tfName.getText();
         String email = tfEmail.getText();
         String phone = tfPhone.getText();
+        String seat = (String) cbSeats.getSelectedItem();
+        if (name.isEmpty() || email.isEmpty() || phone.isEmpty() || seat == null || seat.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "All fields including seat are required.");
+            return;
+        }
         try (Connection con = DBUtil.getConnection();
                 PreparedStatement ps = con
                         .prepareStatement("UPDATE customer SET name=?, email=?, phone=? WHERE customer_id=?")) {
@@ -114,6 +139,7 @@ public class CustomerPanel extends JPanel {
             ps.setString(2, email);
             ps.setString(3, phone);
             ps.setInt(4, selectedId);
+            // Optionally, you can store seat info in customer table if schema allows
             ps.executeUpdate();
             loadCustomers();
             clearForm();
